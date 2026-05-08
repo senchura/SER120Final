@@ -276,4 +276,17 @@ public class GameManager {
         }
         return moves;
     }
+
+    public List<String> loadMovesOnly(String filename) throws IOException {
+        return GameSaver.load(filename);
+    }
+
+    public int[] parseMove(String notation) {
+        String[] parts = notation.toUpperCase().split(" ");
+        if (parts.length != 2) return null;
+        int[] start = parseInput(parts[0]);
+        int[] end   = parseInput(parts[1]);
+        if (start == null || end == null) return null;
+        return new int[]{start[0], start[1], end[0], end[1]};
+    }
 }

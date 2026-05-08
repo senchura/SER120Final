@@ -62,8 +62,10 @@ public class ChessFrame extends JFrame {
             if (fc.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
                 File f = fc.getSelectedFile();
                 try {
-                    gameManager.saveGame(f.getAbsolutePath());
-                    JOptionPane.showMessageDialog(this, "Game saved to " + f.getName());
+                    String path = f.getAbsolutePath();
+                    if (!path.endsWith(".chs")) path += ".chs";
+                    gameManager.saveGame(path);
+                    JOptionPane.showMessageDialog(this, "Game saved to " + new File(path).getName());
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(this, "Failed to save: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -91,10 +93,64 @@ public class ChessFrame extends JFrame {
             }
         });
 
+        JMenuItem replayItem = new JMenuItem("Replay Game...");
+        replayItem.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File f = fc.getSelectedFile();
+                List<String> moves;
+                try {
+                    moves = gameManager.loadMovesOnly(f.getAbsolutePath());
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(this, "Failed to load: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                gameManager.resetGame();
+                boardPanel.reset();
+                whiteCaptures.clear();
+                blackCaptures.clear();
+                statusLabel.setText("Replaying...");
+                statusLabel.setForeground(java.awt.Color.WHITE);
+
+                final int[] index = {0};
+                final Color[] turn = {Color.WHITE};
+                final javax.swing.Timer[] timerHolder = {null};
+
+                javax.swing.Timer replayTimer = new javax.swing.Timer(1000, null);
+                timerHolder[0] = replayTimer;
+                replayTimer.addActionListener(step -> {
+                    if (index[0] >= moves.size()) {
+                        timerHolder[0].stop();
+                        statusLabel.setText("Replay complete.");
+                        return;
+                    }
+                    int[] coords = gameManager.parseMove(moves.get(index[0]));
+                    if (coords != null) {
+                        ser120.chess.models.Piece captured = gameManager.getBoard().grid[coords[2]][coords[3]];
+                        if (captured != null) {
+                            if (turn[0] == Color.WHITE) whiteCaptures.addPiece(captured);
+                            else blackCaptures.addPiece(captured);
+                        }
+                        gameManager.move(coords[0], coords[1], coords[2], coords[3]);
+                        boardPanel.repaint();
+                        turn[0] = (turn[0] == Color.WHITE) ? Color.BLACK : Color.WHITE;
+                        statusLabel.setText("Replay: move " + (index[0] + 1) + " of " + moves.size());
+                    }
+                    index[0]++;
+                });
+                replayTimer.setInitialDelay(0);
+                replayTimer.start();
+            }
+        });
+
         gameMenu.add(newItem);
         gameMenu.addSeparator();
         gameMenu.add(saveItem);
         gameMenu.add(loadItem);
+        gameMenu.addSeparator();
+        gameMenu.add(replayItem);
         menuBar.add(gameMenu);
         setJMenuBar(menuBar);
 
