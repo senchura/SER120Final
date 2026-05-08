@@ -1,6 +1,5 @@
 //Sawyer Enchura
 //SER120
-//test comment
 
 package ser120.chess;
 
