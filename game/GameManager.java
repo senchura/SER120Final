@@ -186,7 +186,7 @@ public class GameManager {
         return new int[]{row, col};
     }
 
-    boolean isValidMove(int sr, int sc, int er, int ec, Color turn) {
+    public boolean isValidMove(int sr, int sc, int er, int ec, Color turn) {
         Piece p = board.grid[sr][sc];
         if (p == null || p.color != turn) return false;
 
@@ -240,10 +240,14 @@ public class GameManager {
         return true;
     }
 
-    void move(int sr, int sc, int er, int ec) {
+    public void move(int sr, int sc, int er, int ec) {
         board.grid[er][ec] = board.grid[sr][sc];
         board.grid[sr][sc] = null;
     }
 
-    CoolBoard getBoard() { return board; }
+    public CoolBoard getBoard() { return board; }
+
+    public void resetGame() {
+        this.board = new CoolBoard(8, 8);
+    }
 }
