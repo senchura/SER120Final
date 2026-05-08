@@ -18,7 +18,7 @@ public class SidebarPanel extends JPanel {
 
     public SidebarPanel(String title) {
         this.title = title;
-        setPreferredSize(new Dimension(80, 8 * 72));
+        setPreferredSize(new Dimension(96, 8 * 72));
         setBackground(new java.awt.Color(30, 30, 30));
     }
 
@@ -45,18 +45,21 @@ public class SidebarPanel extends JPanel {
 
         g2.setFont(new Font("Serif", Font.PLAIN, 26));
         fm = g2.getFontMetrics();
-        int x = 8, y = 36;
-        for (Piece p : captured) {
+        int cellSize = 32;
+        int cols = Math.max(1, getWidth() / cellSize);
+        for (int i = 0; i < captured.size(); i++) {
+            int row = i / cols;
+            int col = i % cols;
+            int rowCount = Math.min(cols, captured.size() - row * cols);
+            int rowOffset = (getWidth() - rowCount * cellSize) / 2;
+            int x = rowOffset + col * cellSize;
+            int y = 36 + row * 36;
+            Piece p = captured.get(i);
             String sym = unicodeSymbol(p);
             g2.setColor(p.color == Color.WHITE
                     ? new java.awt.Color(220, 220, 220)
                     : new java.awt.Color(80, 80, 80));
             g2.drawString(sym, x, y + fm.getAscent());
-            x += 32;
-            if (x + 32 > getWidth()) {
-                x = 8;
-                y += 36;
-            }
         }
     }
 

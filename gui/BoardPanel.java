@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 public class BoardPanel extends JPanel {
 
     private static final int TILE = 72;
-    private static final java.awt.Color LIGHT = new java.awt.Color(240, 217, 181);
+    private static final java.awt.Color LIGHT = new java.awt.Color(200, 175, 140);
     private static final java.awt.Color DARK  = new java.awt.Color(181, 136, 99);
     private static final java.awt.Color SELECT = new java.awt.Color(100, 200, 100, 160);
     private static final java.awt.Color ILLEGAL = new java.awt.Color(220, 60, 60, 180);
@@ -112,7 +112,11 @@ public class BoardPanel extends JPanel {
     }
 
     public void reset() {
-        turn = Color.WHITE;
+        resetWithTurn(Color.WHITE);
+    }
+
+    public void resetWithTurn(Color startTurn) {
+        turn = startTurn;
         gameOver = false;
         showIllegal = false;
         selRow = selCol = -1;
@@ -164,8 +168,8 @@ public class BoardPanel extends JPanel {
         FontMetrics fm = g2.getFontMetrics();
 
         g2.setColor(p.color == Color.WHITE
-                ? new java.awt.Color(30, 30, 30)
-                : new java.awt.Color(230, 230, 230));
+                ? new java.awt.Color(230, 230, 230)
+                : new java.awt.Color(30, 30, 30));
         g2.drawString(symbol,
                 x + (TILE - fm.stringWidth(symbol)) / 2,
                 y + TILE - (TILE - fm.getAscent()) / 2 - 4);

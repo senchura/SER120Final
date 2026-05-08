@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class GameManager {
     private CoolBoard board;
     private final Scanner scanner;
+    private List<String> moveHistory = new ArrayList<>();
 
     public GameManager() {
         this.board = new CoolBoard(8, 8);
@@ -241,6 +242,9 @@ public class GameManager {
     }
 
     public void move(int sr, int sc, int er, int ec) {
+        String from = "" + (char)('A' + sc) + (8 - sr);
+        String to   = "" + (char)('A' + ec) + (8 - er);
+        moveHistory.add(from + " " + to);
         board.grid[er][ec] = board.grid[sr][sc];
         board.grid[sr][sc] = null;
     }
@@ -249,5 +253,27 @@ public class GameManager {
 
     public void resetGame() {
         this.board = new CoolBoard(8, 8);
+        this.moveHistory = new ArrayList<>();
+    }
+
+    public void saveGame(String filename) throws IOException {
+        GameSaver.save(filename, moveHistory);
+    }
+
+    public List<String> loadGame(String filename) throws IOException {
+        List<String> moves = GameSaver.load(filename);
+        this.board = new CoolBoard(8, 8);
+        this.moveHistory = new ArrayList<>();
+        for (String moveStr : moves) {
+            String[] parts = moveStr.toUpperCase().split(" ");
+            int[] start = parseInput(parts[0]);
+            int[] end   = parseInput(parts[1]);
+            if (start != null && end != null) {
+                board.grid[end[0]][end[1]] = board.grid[start[0]][start[1]];
+                board.grid[start[0]][start[1]] = null;
+                moveHistory.add(moveStr);
+            }
+        }
+        return moves;
     }
 }
